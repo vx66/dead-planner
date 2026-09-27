@@ -122,11 +122,11 @@ test('registration requires every field and matching password confirmation', asy
 
 test('production requires a new seed password and uses HTTPS cookies', async () => {
   assert.throws(()=>backend({env:{NODE_ENV:'production'},empty:true}),/Configura SEED_USERNAME/);
-  assert.throws(()=>backend({env:{NODE_ENV:'production',SEED_USERNAME:'owner',SEED_PASSWORD:'short'},empty:true}),/Configura SEED_PASSWORD/);
-  const b=backend({env:{NODE_ENV:'production',SEED_USERNAME:'owner',SEED_PASSWORD:'test-only-seed-password'},empty:true});
+  assert.throws(()=>backend({env:{NODE_ENV:'production',SEED_USERNAME:'owner',SEED_PASSWORD:'abc'},empty:true}),/Configura SEED_PASSWORD/);
+  const b=backend({env:{NODE_ENV:'production',SEED_USERNAME:'owner',SEED_PASSWORD:'SeedTest1234'},empty:true});
   assert.equal(b.db.users[0].username,'owner');
   assert.equal(b.db.users[0].role,'admin');
-  const login=await b.call('post','/api/auth/login',{username:'owner',password:'test-only-seed-password'},null);
+  const login=await b.call('post','/api/auth/login',{username:'owner',password:'SeedTest1234'},null);
   assert.equal(login.code,200);
   assert.match(login.headers['Set-Cookie'],/; Secure/);
   assert.match((await b.call('post','/api/auth/logout',{},null)).headers['Set-Cookie'],/; Secure/);
@@ -140,8 +140,13 @@ test('seed changes do not promote existing users and xergno is not reserved on n
   assert.equal(existing.db.users[1].role,'user');
   assert.equal(existing.db.users[0].role,'admin');
   assert.ok(bcrypt.compareSync('admin-test-password',existing.db.users[0].passwordHash));
-  const fresh=backend({empty:true,env:{SEED_USERNAME:'myadmin',SEED_PASSWORD:'test-only-seed-password'}});
+  const fresh=backend({empty:true,env:{SEED_USERNAME:'myadmin',SEED_PASSWORD:'SeedTest1234'}});
   const registration=await fresh.call('post','/api/auth/register',{username:'xergno',name:'User',email:'user@example.com',password:'user-password',passwordConfirm:'user-password'},null);
   assert.equal(registration.code,201);
   assert.equal(registration.data.user.role,'user');
 });
+
+ test('initial admin password accepts 4 to 12 characters only', () => {
+  for (const password of ['abcd', 'abcdefghijkl']) assert.equal(backend({empty:true,env:{SEED_USERNAME:'owner',SEED_PASSWORD:password}}).db.users[0].role,'admin');
+  for (const password of ['', 'abc', 'abcdefghijklm']) assert.throws(()=>backend({empty:true,env:{SEED_USERNAME:'owner',SEED_PASSWORD:password}}),/Configura SEED_PASSWORD/);
+ });

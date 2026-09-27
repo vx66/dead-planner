@@ -13,7 +13,7 @@ Si usas Git desde esta carpeta, revisa `git status --short`, agrega los archivos
 1. En tu proyecto, crea un servicio de tipo **Docker Compose** (no Docker Stack).
 2. Conecta el repositorio y selecciona la rama que hayas subido.
 3. Define **Compose Path** como `./docker-compose.yml`.
-4. En **Environment**, añade `SEED_USERNAME` con el nombre elegido para tu administrador (3–60 letras, números, puntos, guiones o guiones bajos) y `SEED_PASSWORD` con una contraseña nueva y única (12 caracteres como mínimo; 72 bytes como máximo). Puedes generar un valor hexadecimal largo con un gestor de contraseñas. `.env.example` muestra el nombre de la variable.
+4. En **Environment**, añade `SEED_USERNAME` con el nombre elegido para tu administrador (3–60 letras, números, puntos, guiones o guiones bajos) y `SEED_PASSWORD` con una contraseña nueva y única (entre 4 y 12 caracteres). Puedes generar un valor de 12 caracteres con un gestor de contraseñas. `.env.example` muestra el nombre de la variable.
 5. Guarda la configuración.
 
 El usuario inicial se elige con `SEED_USERNAME` y se crea con rol admin. El Compose fija el entorno en producción y la zona horaria en `America/Santiago`. Ambas variables de seed se usan únicamente si la base está vacía. Con una base existente no cambia ninguna contraseña: utiliza ADMIN para cambiarla.

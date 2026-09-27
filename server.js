@@ -91,8 +91,8 @@ function seed() {
     if (!/^[a-zA-Z0-9_.-]{3,60}$/.test(SEED_USERNAME)) {
       throw new Error('Configura SEED_USERNAME: entre 3 y 60 letras, numeros, puntos, guiones o guiones bajos');
     }
-    if (SEED_PASSWORD.length < 12 || Buffer.byteLength(SEED_PASSWORD, 'utf8') > 72) {
-      throw new Error('Configura SEED_PASSWORD con una contrasena unica de 12 caracteres como minimo (maximo 72 bytes)');
+    if (Array.from(SEED_PASSWORD).length < 4 || Array.from(SEED_PASSWORD).length > 12) {
+      throw new Error('Configura SEED_PASSWORD con una contrasena de entre 4 y 12 caracteres');
     }
     const hash = bcrypt.hashSync(SEED_PASSWORD, 10);
     db.users.push({

@@ -64,7 +64,7 @@ La raíz de este repositorio ya contiene el **Dockerfile** y **docker-compose.ym
 
 1. En Dokploy, crea un servicio **Docker Compose** y conecta [`vx66/dead-planner`](https://github.com/vx66/dead-planner).
 2. Selecciona la rama `main` y el archivo `./docker-compose.yml`.
-3. En **Environment**, configura `SEED_USERNAME` con el nombre de tu administrador (3–60 letras, números, puntos, guiones o guiones bajos) y `SEED_PASSWORD` con una contraseña única de al menos 12 caracteres y un máximo de 72 bytes.
+3. En **Environment**, configura `SEED_USERNAME` con el nombre de tu administrador (3–60 letras, números, puntos, guiones o guiones bajos) y `SEED_PASSWORD` con una contraseña única de entre 4 y 12 caracteres.
 4. Asocia tu dominio al servicio **`dead-planner`**, puerto interno **`3000`**, y activa **HTTPS**.
 5. Despliega e inicia sesión con el usuario y la contraseña que configuraste.
 
