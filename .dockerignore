@@ -1,0 +1,17 @@
+**
+!Dockerfile
+!package.json
+!package-lock.json
+!server.js
+!store.js
+!accounts.js
+!public/
+!public/index.html
+!public/css/
+!public/css/style.css
+!public/js/
+!public/js/date.js
+!public/js/api.js
+!public/js/calendar.js
+!public/js/app.js
+!public/js/accounts.js

@@ -1,0 +1,28 @@
+services:
+  dead-planner:
+    build:
+      context: .
+    restart: unless-stopped
+    init: true
+    expose:
+      - "3000"
+    volumes:
+      - dead-planner-data:/app/data
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      DATA_DIR: /app/data
+      TZ: America/Santiago
+      COOKIE_SECURE: "true"
+      SEED_USERNAME: xergno
+      SEED_PASSWORD: ${SEED_PASSWORD:?Define SEED_PASSWORD en Environment de Dokploy}
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  dead-planner-data:
