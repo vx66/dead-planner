@@ -121,14 +121,27 @@ test('registration requires every field and matching password confirmation', asy
 });
 
 test('production requires a new seed password and uses HTTPS cookies', async () => {
-  assert.throws(()=>backend({env:{NODE_ENV:'production'},empty:true}),/Configura SEED_PASSWORD/);
-  assert.throws(()=>backend({env:{NODE_ENV:'production',SEED_PASSWORD:'simbionte67'},empty:true}),/Configura SEED_PASSWORD/);
-  const b=backend({env:{NODE_ENV:'production',SEED_PASSWORD:'test-only-seed-password'},empty:true});
-  const login=await b.call('post','/api/auth/login',{username:'xergno',password:'test-only-seed-password'},null);
+  assert.throws(()=>backend({env:{NODE_ENV:'production'},empty:true}),/Configura SEED_USERNAME/);
+  assert.throws(()=>backend({env:{NODE_ENV:'production',SEED_USERNAME:'owner',SEED_PASSWORD:'short'},empty:true}),/Configura SEED_PASSWORD/);
+  const b=backend({env:{NODE_ENV:'production',SEED_USERNAME:'owner',SEED_PASSWORD:'test-only-seed-password'},empty:true});
+  assert.equal(b.db.users[0].username,'owner');
+  assert.equal(b.db.users[0].role,'admin');
+  const login=await b.call('post','/api/auth/login',{username:'owner',password:'test-only-seed-password'},null);
   assert.equal(login.code,200);
   assert.match(login.headers['Set-Cookie'],/; Secure/);
   assert.match((await b.call('post','/api/auth/logout',{},null)).headers['Set-Cookie'],/; Secure/);
   const health=await b.call('get','/api/health',{},null);
   assert.equal(health.code,200);
   assert.equal(health.data.status,'ok');
+});
+
+test('seed changes do not promote existing users and xergno is not reserved on new installs', async () => {
+  const existing=backend({env:{SEED_USERNAME:'normal',SEED_PASSWORD:'different-password'}});
+  assert.equal(existing.db.users[1].role,'user');
+  assert.equal(existing.db.users[0].role,'admin');
+  assert.ok(bcrypt.compareSync('admin-test-password',existing.db.users[0].passwordHash));
+  const fresh=backend({empty:true,env:{SEED_USERNAME:'myadmin',SEED_PASSWORD:'test-only-seed-password'}});
+  const registration=await fresh.call('post','/api/auth/register',{username:'xergno',name:'User',email:'user@example.com',password:'user-password',passwordConfirm:'user-password'},null);
+  assert.equal(registration.code,201);
+  assert.equal(registration.data.user.role,'user');
 });

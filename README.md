@@ -48,7 +48,7 @@ Una interfaz directa. Un calendario que sigue tu horario.
 | **Registro** | Crear una cuenta con todos los campos obligatorios y confirmación de contraseña. |
 | **Administración** | Listar usuarios, editar datos, cambiar contraseñas, bloquear y eliminar cuentas. |
 
-La cuenta **`xergno`** es administradora. Los nuevos registros reciben el rol de usuario normal. Los permisos se verifican en el servidor; la cuenta administradora está protegida contra bloqueo y eliminación.
+La cuenta elegida en **`SEED_USERNAME`** se crea como administradora en el primer arranque. Los nuevos registros reciben el rol de usuario normal. Los permisos se verifican en el servidor; la cuenta administradora está protegida contra bloqueo y eliminación.
 
 > El catálogo de tags se guarda en el navegador, separado por usuario. La etiqueta asignada y su color se guardan junto con la tarea en el servidor.
 
@@ -64,9 +64,9 @@ La raíz de este repositorio ya contiene el **Dockerfile** y **docker-compose.ym
 
 1. En Dokploy, crea un servicio **Docker Compose** y conecta [`vx66/dead-planner`](https://github.com/vx66/dead-planner).
 2. Selecciona la rama `main` y el archivo `./docker-compose.yml`.
-3. En **Environment**, configura `SEED_PASSWORD` con una contraseña única de al menos 12 caracteres y un máximo de 72 bytes.
+3. En **Environment**, configura `SEED_USERNAME` con el nombre de tu administrador (3–60 letras, números, puntos, guiones o guiones bajos) y `SEED_PASSWORD` con una contraseña única de al menos 12 caracteres y un máximo de 72 bytes.
 4. Asocia tu dominio al servicio **`dead-planner`**, puerto interno **`3000`**, y activa **HTTPS**.
-5. Despliega e inicia sesión como **`xergno`**.
+5. Despliega e inicia sesión con el usuario y la contraseña que configuraste.
 
 ### Configuración incluida
 
@@ -83,7 +83,7 @@ La raíz de este repositorio ya contiene el **Dockerfile** y **docker-compose.ym
 
 **[Leer la guía completa de Dokploy →](DOKPLOY.md)**
 
-> `SEED_PASSWORD` solo crea la cuenta inicial cuando la base está vacía. Si importas una base existente, se conservan sus cuentas y contraseñas. Cambia las contraseñas desde ADMIN; no borres la base para reiniciarlas.
+> `SEED_USERNAME` y `SEED_PASSWORD` solo se usan cuando la base está vacía. Cambiarlas después no renombra cuentas, no cambia contraseñas y no otorga permisos a usuarios existentes. Si importas una base existente, se conservan sus cuentas y contraseñas. Cambia las contraseñas desde ADMIN; no borres la base para reiniciarlas.
 
 ## Desarrollo
 
@@ -93,11 +93,13 @@ Recomendado: **Node.js 24**. Para arrancar manualmente desde PowerShell:
 git clone https://github.com/vx66/dead-planner.git
 cd dead-planner
 npm ci
-$env:SEED_PASSWORD = "TU_CONTRASENA_LOCAL_UNICA"
+Copy-Item .env.example .env
+notepad .env
+# Completa SEED_USERNAME y SEED_PASSWORD, guarda y cierra el editor.
 npm start
 ```
 
-Abre `http://localhost:3000`. La variable anterior es necesaria para usar una contraseña propia al crear una base local nueva. El archivo `.env.example` documenta las variables de despliegue; la ejecución directa con Node no carga archivos `.env` automáticamente.
+Abre `http://localhost:3000`. `npm start` y `npm run dev` cargan el archivo `.env`. Para ejecutar sin npm, usa `node --env-file-if-exists=.env server.js`. En Dokploy configura las mismas variables en **Environment**; no subas tu `.env` a GitHub.
 
 ### Pruebas aisladas
 

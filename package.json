@@ -4,11 +4,11 @@
   "description": "Dead Planner - retro cyberpunk terminal calendar planner",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node --env-file-if-exists=.env server.js",
+    "dev": "node --env-file-if-exists=.env server.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=24"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

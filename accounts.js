@@ -30,7 +30,7 @@ function mountAccounts(app, store, authRequired) {
     const error = validateAccount(body, true);
     if (error) return res.status(400).json({ error });
     const username = body.username.trim();
-    if (username.toLowerCase() === 'xergno' || conflict(username)) return res.status(409).json({ error: 'Username no disponible' });
+    if (conflict(username)) return res.status(409).json({ error: 'Username no disponible' });
     const passwordHash = await bcrypt.hash(body.password, 10);
     // Another registration can finish while hashing.
     if (conflict(username)) return res.status(409).json({ error: 'Username no disponible' });
@@ -57,7 +57,7 @@ function mountAccounts(app, store, authRequired) {
     if (typeof body.disabled !== 'boolean') return res.status(400).json({ error: 'Estado invalido' });
     if (user.role === 'admin' && body.disabled) return res.status(400).json({ error: 'No se puede bloquear al administrador' });
     const username = body.username.trim();
-    if ((username.toLowerCase() === 'xergno' && user.role !== 'admin') || conflict(username, user.id)) return res.status(409).json({ error: 'Username no disponible' });
+    if (conflict(username, user.id)) return res.status(409).json({ error: 'Username no disponible' });
     const passwordHash = body.password ? await bcrypt.hash(body.password, 10) : null;
     if (!db.users.includes(user)) return res.status(404).json({ error: 'Usuario no encontrado' });
     if (conflict(username, user.id)) return res.status(409).json({ error: 'Username no disponible' });

@@ -14,7 +14,7 @@ services:
       DATA_DIR: /app/data
       TZ: America/Santiago
       COOKIE_SECURE: "true"
-      SEED_USERNAME: xergno
+      SEED_USERNAME: ${SEED_USERNAME:?Define SEED_USERNAME en Environment de Dokploy}
       SEED_PASSWORD: ${SEED_PASSWORD:?Define SEED_PASSWORD en Environment de Dokploy}
     security_opt:
       - no-new-privileges:true

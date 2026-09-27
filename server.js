@@ -10,8 +10,8 @@ const DateUtil = require('./public/js/date');
 const PORT = process.env.PORT || 3000;
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 const COOKIE_NAME = 'dp_session';
-const SEED_USERNAME = process.env.SEED_USERNAME || 'Xergno';
-const SEED_PASSWORD = process.env.SEED_PASSWORD || 'simbionte67';
+const SEED_USERNAME = (process.env.SEED_USERNAME || '').trim();
+const SEED_PASSWORD = process.env.SEED_PASSWORD || '';
 const COOKIE_SECURE = process.env.COOKIE_SECURE === 'true' || (process.env.NODE_ENV === 'production' && process.env.COOKIE_SECURE !== 'false');
 
 const app = express();
@@ -88,7 +88,10 @@ function authRequired(req, res, next) {
 function seed() {
   const db = store.getDB();
   if (db.users.length === 0) {
-    if (process.env.NODE_ENV === 'production' && (!process.env.SEED_PASSWORD || SEED_PASSWORD.length < 12 || Buffer.byteLength(SEED_PASSWORD, 'utf8') > 72 || SEED_PASSWORD === 'simbionte67')) {
+    if (!/^[a-zA-Z0-9_.-]{3,60}$/.test(SEED_USERNAME)) {
+      throw new Error('Configura SEED_USERNAME: entre 3 y 60 letras, numeros, puntos, guiones o guiones bajos');
+    }
+    if (SEED_PASSWORD.length < 12 || Buffer.byteLength(SEED_PASSWORD, 'utf8') > 72) {
       throw new Error('Configura SEED_PASSWORD con una contrasena unica de 12 caracteres como minimo (maximo 72 bytes)');
     }
     const hash = bcrypt.hashSync(SEED_PASSWORD, 10);
@@ -99,6 +102,8 @@ function seed() {
       email: '',
       passwordHash: hash,
       avatar: '',
+      role: 'admin',
+      disabled: false,
       createdAt: Date.now()
     });
     console.log('[seed] Usuario principal creado:', SEED_USERNAME);
@@ -108,6 +113,8 @@ function seed() {
   let migrated = false;
   for (const user of db.users) {
     if (!user.role) {
+      // Compatibility only for accounts created before roles existed.
+      // Never promote an existing account based on a new seed configuration.
       user.role = user.username.toLowerCase() === 'xergno' ? 'admin' : 'user';
       user.disabled = false;
       migrated = true;
@@ -169,7 +176,6 @@ app.put('/api/users/me', authRequired, (req, res) => {
 
   if (typeof username === 'string' && username.trim()) {
     const candidate = username.trim();
-    if (candidate.toLowerCase() === 'xergno' && user.role !== 'admin') return res.status(409).json({ error: 'Username reservado' });
     const clash = db.users.find((u) => u.id !== user.id && u.username.toLowerCase() === candidate.toLowerCase());
     if (clash) return res.status(409).json({ error: 'Username ya esta en uso' });
     user.username = candidate;

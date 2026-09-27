@@ -13,10 +13,10 @@ Si usas Git desde esta carpeta, revisa `git status --short`, agrega los archivos
 1. En tu proyecto, crea un servicio de tipo **Docker Compose** (no Docker Stack).
 2. Conecta el repositorio y selecciona la rama que hayas subido.
 3. Define **Compose Path** como `./docker-compose.yml`.
-4. En **Environment**, añade `SEED_PASSWORD` con una contraseña nueva y única (12 caracteres como mínimo; 72 bytes como máximo). Puedes generar un valor hexadecimal largo con un gestor de contraseñas. `.env.example` muestra el nombre de la variable.
+4. En **Environment**, añade `SEED_USERNAME` con el nombre elegido para tu administrador (3–60 letras, números, puntos, guiones o guiones bajos) y `SEED_PASSWORD` con una contraseña nueva y única (12 caracteres como mínimo; 72 bytes como máximo). Puedes generar un valor hexadecimal largo con un gestor de contraseñas. `.env.example` muestra el nombre de la variable.
 5. Guarda la configuración.
 
-El Compose fija el usuario inicial en `xergno`, el entorno en producción y la zona horaria en `America/Santiago`. La contraseña de seed se usa únicamente si la base está vacía. Con una base existente no cambia ninguna contraseña: utiliza ADMIN para cambiarla.
+El usuario inicial se elige con `SEED_USERNAME` y se crea con rol admin. El Compose fija el entorno en producción y la zona horaria en `America/Santiago`. Ambas variables de seed se usan únicamente si la base está vacía. Con una base existente no cambia ninguna contraseña: utiliza ADMIN para cambiarla.
 
 ## 3. Dominio y HTTPS
 
@@ -40,7 +40,7 @@ La aplicación usa cookies `Secure`: debes entrar por HTTPS. El puerto 3000 es i
 
 Pulsa **Deploy**. Dokploy construirá la imagen y ejecutará la instalación de dependencias dentro de Docker. El proceso de la app corre como el usuario `node` (UID 1000), no como root.
 
-Comprueba que el servicio quede `healthy`. El chequeo interno consulta `/api/health`, que devuelve `{"status":"ok"}` si el proceso está activo y la base está cargada; no comprueba escritura en disco. Luego entra por tu dominio HTTPS y accede como `xergno` con la contraseña configurada. Si importaste una base existente, usa su contraseña anterior.
+Comprueba que el servicio quede `healthy`. El chequeo interno consulta `/api/health`, que devuelve `{"status":"ok"}` si el proceso está activo y la base está cargada; no comprueba escritura en disco. Luego entra por tu dominio HTTPS y accede con el usuario de `SEED_USERNAME` y la contraseña configurada. Si importaste una base existente, usa su contraseña anterior.
 
 Comprueba manualmente: login, registro completo, creación de una tarea, recarga de página y panel ADMIN. El ZIP no ha sido desplegado ni la imagen construida en esta sesión.
 
@@ -48,7 +48,7 @@ Comprueba manualmente: login, registro completo, creación de una tarea, recarga
 
 El volumen lógico `dead-planner-data` se monta en `/app/data`. Docker Compose le asigna un nombre que incluye el proyecto. Conserva el mismo servicio/proyecto y volumen al actualizar. No uses `down -v`, no borres el volumen y no habilites réplicas múltiples: esta aplicación utiliza un archivo JSON y debe funcionar con una sola instancia.
 
-El cambio de Node 20 a Node 24 no migra ni borra los datos. La cuenta existente `xergno` recibe el rol admin si todavía no tenía un rol definido.
+El cambio de Node 20 a Node 24 no migra ni borra los datos. Los roles existentes se conservan; cambiar `SEED_USERNAME` no promueve otra cuenta ni reemplaza al administrador. Solo se mantiene la migración histórica de `xergno` para bases antiguas que todavía no tenían roles.
 
 ### Copia de seguridad
 
